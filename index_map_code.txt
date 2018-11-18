@@ -1,0 +1,46 @@
+  /*
+    public void insertIntoIndex(){
+        HashMap<Integer,String> dictionaryDecodeMap = rfObj.getDictionaryDecodeMap();// s-->id p-->id o-->id
+        this.iterateHashMap(dictionaryDecodeMap);
+    }
+
+    private void iterateHashMap(HashMap<Integer,String> map){
+        map.entrySet().forEach(x -> {
+            //System.out.println(x.getValue() + "\n");
+            try {
+                insertKey(x.getKey(),x.getValue(),true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InvalidBTreeStateException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void myIterate(HashMap<Integer,String[]> map){//triples
+        map.entrySet().forEach(x -> {
+            //System.out.println( String.valueOf(x.getValue()) + "\n");
+            try {
+                insertKey(x.getKey(), String.valueOf(x.getValue()),true);
+               // System.out.println("x.getKey() : " + x.getKey() + " String.valueOf(x.getValue()) :" + String.valueOf(x.getValue()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InvalidBTreeStateException e) {
+                e.printStackTrace();
+            }
+        });
+    }*/
+
+    /*private void mymapiterate(HashMap<String[],List<Integer>> map){
+        map.entrySet().forEach((Map.Entry<String[], List<Integer>> x) -> {
+            //System.out.println("value is : " + x.getValue() + "\n" + "key is : " + x.getKey().toString() + "\n");
+
+        });
+
+       /* for (List<Integer> s : map.values()){
+            System.out.println("value is : " + s + "\n");
+        }
+
+        for (String[] key : map.keySet()) {
+            System.out.println("key is : " + key.toString());
+        }*/

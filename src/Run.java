@@ -107,10 +107,7 @@ public class Run {
                 HashMap<String, Integer> encodeMap = Run.getEncodeHashMap();
                 HashMap<Integer, String> decodeMap = Run.getDecodeHashMap();
 
-
                 String[] arr = Run.sampleQuery();
-                System.out.println(encodeMap.get("<http://db.uwaterloo.ca/~galuc/wsdbm/Country0>"));
-
                 System.out.println(arr[0] + "" + arr[1] + "" + arr[2]);
                 System.out.println(encodeMap.get(arr[0]) + "" + encodeMap.get(arr[1]) + "" + encodeMap.get(arr[2]));//Input encoding
                 System.out.println(decodeMap.get(encodeMap.get(arr[0])) + "" + decodeMap.get(encodeMap.get(arr[1])) + "" + decodeMap.get(encodeMap.get(arr[2])));
@@ -119,14 +116,14 @@ public class Run {
                 //Encode-Decode example
 
                 //Join example
-                LinkedList<Integer> placesValuesFound = indexOP_S.searchInPermutationTree("14", "288", "OP_S");
+                LinkedList<Integer> placesValuesFound = indexOP_S.searchInPermutationTree(encodeMap.get(arr[2]).toString(), encodeMap.get(arr[1]).toString(), "OP_S");
                 startTime = System.nanoTime();
                 LinkedList<Integer> subjectList = Index.queryOP_S(placesValuesFound, indexOP_S);
                 stopTime = System.nanoTime();
                 System.out.println("First list created : " + (stopTime - startTime) / Math.pow(10, 9));
                 placesValuesFound.clear();
 
-                placesValuesFound = indexOP_S.searchInPermutationTree("12", "288", "OP_S");
+                placesValuesFound = indexOP_S.searchInPermutationTree("14", "288", "OP_S");
                 startTime = System.nanoTime();
                 LinkedList<Integer> subjectList2 = Index.queryOP_S(placesValuesFound, indexOP_S);
                 stopTime = System.nanoTime();
@@ -140,7 +137,7 @@ public class Run {
                 System.out.println(joinedList);
                 //Join example
 
-                Run.printTriples(joinedList, "288", "14", "288", "12");
+                Run.printTriples(joinedList,  encodeMap.get(arr[1]).toString(),encodeMap.get(arr[2]).toString(), "288", "14");
 
                 placesValuesFound = indexOP_S.searchInPermutationTree("80", "288", "OP_S");
                 LinkedList<Integer> subjectList3 = Index.queryOP_S(placesValuesFound, indexOP_S);
@@ -149,13 +146,13 @@ public class Run {
 
                 joinedList = Index.generalJoin(joinedList, subjectList3);
                 System.out.println(joinedList);
-
             }
         } catch (InvalidBTreeStateException e) {
             e.printStackTrace();
         }
     }
-
+    //288 -> <http://schema.org/eligibleRegion>
+    //12 --> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1>
     private static String[] sampleQuery() {
         System.out.println("Enter resources:");
         String userSubject = "";
@@ -179,7 +176,7 @@ public class Run {
         arr[2] = userObject;
         //arr[0] = "<http://db.uwaterloo.ca/~galuc/wsdbm/City0>";
         //arr[1] = "<http://www.geonames.org/ontology#parentCountry>";
-       // arr[2] = "<http://db.uwaterloo.ca/~galuc/wsdbm/Country6>";
+        //arr[2] = "<http://db.uwaterloo.ca/~galuc/wsdbm/Country6>";
         return arr;
     }
 

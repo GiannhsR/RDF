@@ -23,7 +23,7 @@ public class ReadFile {
 
     private static HashMap<String, Integer> dictionaryEncodeMap = new HashMap<>();
 
-    private static HashMap<Integer, String> dictionaryDecodeMap = new HashMap<>();//Static so every ReadFile object can access the same values
+    private static HashMap<Integer, String> dictionaryDecodeMap = new HashMap<>();
 
     public ReadFile() throws IOException {
     }

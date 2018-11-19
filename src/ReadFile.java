@@ -141,7 +141,7 @@ public class ReadFile {
             bw.close();
             System.out.println("--------------\n");
         } catch (IOException x) {
-            System.out.println(x);
+            x.printStackTrace();
         }
     }
 
@@ -150,7 +150,7 @@ public class ReadFile {
      * and writes it in the file
      *
      * @param id to be written on file
-     * @throws IOException
+     * @throws IOException ''
      */
     private void createEncodedFile(int id) throws IOException {
         writerEncoder.write(String.valueOf(id) + " ");
@@ -230,7 +230,7 @@ public class ReadFile {
             int index;
             reader = new BufferedReader(new FileReader(dictionaryFilePath));
             while ((line = reader.readLine()) != null) {
-                if (line.contains(">=") || line.contains("\"=")) {
+                if (line.contains(">=") || line.contains("\"=") || line.contains("288=14")) {
                     int indexOfDelimiter = line.indexOf("=");
                     startingURI = line.substring(0, indexOfDelimiter);
                     index = Integer.parseInt(line.substring(indexOfDelimiter + 1, line.length()));

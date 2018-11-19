@@ -107,23 +107,25 @@ public class Run {
                 HashMap<String, Integer> encodeMap = Run.getEncodeHashMap();
                 HashMap<Integer, String> decodeMap = Run.getDecodeHashMap();
 
-                String[] arr = Run.sampleQuery();
-                System.out.println(arr[0] + "" + arr[1] + "" + arr[2]);
-                System.out.println(encodeMap.get(arr[0]) + "" + encodeMap.get(arr[1]) + "" + encodeMap.get(arr[2]));//Input encoding
-                System.out.println(decodeMap.get(encodeMap.get(arr[0])) + "" + decodeMap.get(encodeMap.get(arr[1])) + "" + decodeMap.get(encodeMap.get(arr[2])));
-
                 ArrayList<String> arrayList = Index.reconstructArrayList("OP_S");
+
+                String[] resources = Run.provideResources();
+                System.out.println(resources[0] + "" + resources[1] + "" + resources[2]);
+                System.out.println(encodeMap.get(resources[0]) + "" + encodeMap.get(resources[1]) + "" + encodeMap.get(resources[2]));//Input encoding
+                System.out.println(decodeMap.get(encodeMap.get(resources[0])) + "" + decodeMap.get(encodeMap.get(resources[1])) + "" + decodeMap.get(encodeMap.get(resources[2])));
+
                 //Encode-Decode example
 
                 //Join example
-                LinkedList<Integer> placesValuesFound = indexOP_S.searchInPermutationTree(encodeMap.get(arr[2]).toString(), encodeMap.get(arr[1]).toString(), "OP_S");
+                LinkedList<Integer> placesValuesFound = indexOP_S.searchInPermutationTree(encodeMap.get(resources[2]).toString(), encodeMap.get(resources[1]).toString(), "OP_S");
                 startTime = System.nanoTime();
                 LinkedList<Integer> subjectList = Index.queryOP_S(placesValuesFound, indexOP_S);
                 stopTime = System.nanoTime();
                 System.out.println("First list created : " + (stopTime - startTime) / Math.pow(10, 9));
                 placesValuesFound.clear();
 
-                placesValuesFound = indexOP_S.searchInPermutationTree("14", "288", "OP_S");
+                String[] resources2 = Run.provideResources();
+                placesValuesFound = indexOP_S.searchInPermutationTree(encodeMap.get(resources2[2]).toString(), encodeMap.get(resources2[1]).toString(), "OP_S");
                 startTime = System.nanoTime();
                 LinkedList<Integer> subjectList2 = Index.queryOP_S(placesValuesFound, indexOP_S);
                 stopTime = System.nanoTime();
@@ -137,7 +139,8 @@ public class Run {
                 System.out.println(joinedList);
                 //Join example
 
-                Run.printTriples(joinedList,  encodeMap.get(arr[1]).toString(),encodeMap.get(arr[2]).toString(), "288", "14");
+                Run.printTriples(joinedList, encodeMap.get(resources[1]).toString(), encodeMap.get(resources[2]).toString(),
+                                                encodeMap.get(resources2[1]).toString(), encodeMap.get(resources2[2]).toString());
 
                 placesValuesFound = indexOP_S.searchInPermutationTree("80", "288", "OP_S");
                 LinkedList<Integer> subjectList3 = Index.queryOP_S(placesValuesFound, indexOP_S);
@@ -151,13 +154,18 @@ public class Run {
             e.printStackTrace();
         }
     }
-    //288 -> <http://schema.org/eligibleRegion>
-    //12 --> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1>
-    private static String[] sampleQuery() {
+
+    //288 -> <http://schema.org/eligibleRegion> Predicate
+    //12 --> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1> Object
+
+    //288 -> <http://schema.org/eligibleRegion> Predicate
+    //14 --> 288 Object
+    private static String[] provideResources() {
         System.out.println("Enter resources:");
-        String userSubject = "";
-        String userPredicate = "";
-        String userObject = "";
+        String[] arr = new String[3];
+        String userSubject;
+        String userPredicate;
+        String userObject;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Subject:" );
@@ -166,14 +174,12 @@ public class Run {
             userPredicate = br.readLine();
             System.out.println("Object:" );
             userObject = br.readLine();
-            br.close();
+            arr[0] = userSubject.trim();
+            arr[1] = userPredicate.trim();
+            arr[2] = userObject.trim();
         }catch (IOException e) {
             e.printStackTrace();
         }
-        String[] arr = new String[3];
-        arr[0] = userSubject;
-        arr[1] = userPredicate;
-        arr[2] = userObject;
         //arr[0] = "<http://db.uwaterloo.ca/~galuc/wsdbm/City0>";
         //arr[1] = "<http://www.geonames.org/ontology#parentCountry>";
         //arr[2] = "<http://db.uwaterloo.ca/~galuc/wsdbm/Country6>";
@@ -181,8 +187,10 @@ public class Run {
     }
 
     private static void printTriples(LinkedList<Integer> joinedList, String predicate1, String object1, String predicate2, String object2) {
-        for (Integer subject : joinedList) {
-            System.out.println("Triples found : " + subject + " " + predicate1 + " " + object1 + " and " + subject + " " + predicate2 + " " + object2);
+        if(!joinedList.isEmpty()){
+            for (Integer subject : joinedList) {
+                System.out.println("Triples found : " + subject + " " + predicate1 + " " + object1 + " and " + subject + " " + predicate2 + " " + object2);
+            }
         }
     }
 
@@ -194,7 +202,6 @@ public class Run {
         return ReadFile.getDictionaryEncodeMap();
     }
 }
-
 
 /* SO_P Example
                 LinkedList<Integer> placesValuesFound = indexSO_P.searchInPermutationTree("1", "3", "SO_P");
@@ -226,4 +233,12 @@ public class Run {
 
                 LinkedList<Integer> joinedList = Index.generalJoin(predicateList,predicateList2);
                 System.out.println(joinedList);
+
+                System.out.println("--------");
+                System.out.println(encodeMap.get("288"));
+                System.out.println(decodeMap.get(2166));
+                System.out.println(encodeMap.get("2166"));
+                System.out.println(decodeMap.get(14));
+                System.out.println(encodeMap.get("14"));
+                System.out.println("--------");
 */

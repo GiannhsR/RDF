@@ -1,20 +1,23 @@
 import ds.bplus.bptree.BPlusConfiguration;
 import ds.bplus.bptree.BPlusTreePerformanceCounter;
 import ds.bplus.util.InvalidBTreeStateException;
+import org.apache.jena.query.QueryException;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementVisitorBase;
+import org.apache.jena.sparql.syntax.ElementWalker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Run {
-
     public static void initialize(boolean recreateIndex) throws IOException, UnknownIndexException {
         long startTime;
         long stopTime;
-
         try {
             //Basic indexes paths
             String treeFilePathSPO = "watdiv10M\\17MBFOLDER\\SPO_index_17MB";
@@ -113,7 +116,6 @@ public class Run {
                 System.out.println(resources[0] + "" + resources[1] + "" + resources[2]);
                 System.out.println(encodeMap.get(resources[0]) + "" + encodeMap.get(resources[1]) + "" + encodeMap.get(resources[2]));//Input encoding
                 System.out.println(decodeMap.get(encodeMap.get(resources[0])) + "" + decodeMap.get(encodeMap.get(resources[1])) + "" + decodeMap.get(encodeMap.get(resources[2])));
-
                 //Encode-Decode example
 
                 //Join example
@@ -140,7 +142,7 @@ public class Run {
                 //Join example
 
                 Run.printTriples(joinedList, encodeMap.get(resources[1]).toString(), encodeMap.get(resources[2]).toString(),
-                                                encodeMap.get(resources2[1]).toString(), encodeMap.get(resources2[2]).toString());
+                        encodeMap.get(resources2[1]).toString(), encodeMap.get(resources2[2]).toString());
 
                 placesValuesFound = indexOP_S.searchInPermutationTree("80", "288", "OP_S");
                 LinkedList<Integer> subjectList3 = Index.queryOP_S(placesValuesFound, indexOP_S);
@@ -149,6 +151,10 @@ public class Run {
 
                 joinedList = Index.generalJoin(joinedList, subjectList3);
                 System.out.println(joinedList);
+
+                HashMap<String, ArrayList<String>> triple = Run.extractTriple();
+                System.out.println(triple.toString());
+                System.out.println(triple.get("subjects").toString());
             }
         } catch (InvalidBTreeStateException e) {
             e.printStackTrace();
@@ -168,16 +174,16 @@ public class Run {
         String userObject;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Subject:" );
+            System.out.println("Subject:");
             userSubject = br.readLine();
-            System.out.println("Predicate:" );
+            System.out.println("Predicate:");
             userPredicate = br.readLine();
-            System.out.println("Object:" );
+            System.out.println("Object:");
             userObject = br.readLine();
             arr[0] = userSubject.trim();
             arr[1] = userPredicate.trim();
             arr[2] = userObject.trim();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         //arr[0] = "<http://db.uwaterloo.ca/~galuc/wsdbm/City0>";
@@ -187,11 +193,59 @@ public class Run {
     }
 
     private static void printTriples(LinkedList<Integer> joinedList, String predicate1, String object1, String predicate2, String object2) {
-        if(!joinedList.isEmpty()){
+        if (!joinedList.isEmpty()) {
             for (Integer subject : joinedList) {
                 System.out.println("Triples found : " + subject + " " + predicate1 + " " + object1 + " and " + subject + " " + predicate2 + " " + object2);
             }
         }
+    }
+
+    private static HashMap<String, ArrayList<String>> extractTriple() {
+        HashMap<String, ArrayList<String>> triple = new HashMap<>();
+        try {
+            String queryStr =
+                    "PREFIX geo:  <http://www.geonames.org/ontology#>\n" +
+                            "PREFIX wsdbm: <http://db.uwaterloo.ca/~galuc/wsdbm/>\n " +
+                            "SELECT ?x\n" +
+                            "WHERE\n" +
+                            " { ?x  geo:parentCountry wsdbm:Country6 .\n" + " }";
+
+            org.apache.jena.query.Query query = QueryFactory.create(queryStr);
+
+            final ArrayList<String> subjects = new ArrayList<>();
+            final ArrayList<String> props = new ArrayList<>();
+            final ArrayList<String> objs = new ArrayList<>();
+            List<TriplePath> l = new ArrayList<>();
+
+            ElementWalker.walk(query.getQueryPattern(),
+                    new ElementVisitorBase() {
+                        public void visit(ElementPathBlock el) {
+                            Iterator<TriplePath> triples = el.patternElts();
+                            TriplePath triple;
+                            l.addAll(el.getPattern().getList());
+                            while (triples.hasNext()) {
+                                triple = triples.next();
+                                subjects.add(triple.getSubject().toString());
+                                props.add(triple.getPredicate().toString());
+                                objs.add(triple.getObject().toString());
+                            }
+                        }
+                    }
+            );
+            System.out.println("Triplets " + l);
+            System.out.println("S " + subjects.toString());
+            System.out.println("P " + props.toString());
+            System.out.println("O " + objs.toString());
+            if(!subjects.isEmpty())
+                triple.put("subjects",subjects);
+            if(!props.isEmpty())
+                triple.put("props",props);
+            if(!objs.isEmpty())
+                triple.put("objs",objs);
+        } catch (QueryException er) {
+            System.out.println("---INVALID QUERY SYNTAX---");
+        }
+        return triple;
     }
 
     private static HashMap<Integer, String> getDecodeHashMap() {

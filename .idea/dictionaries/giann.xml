@@ -2,7 +2,9 @@
   <dictionary name="giann">
     <words>
       <w>mbfolder</w>
+      <w>objs</w>
       <w>perf</w>
+      <w>preds</w>
       <w>preprocess</w>
       <w>preprop</w>
       <w>sparql</w>

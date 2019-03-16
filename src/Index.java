@@ -443,7 +443,7 @@ public class Index extends BPlusTree {
             clearArrayList();
             System.out.println("--------------\n");
         } catch (IOException x) {
-            System.out.println(x);
+            x.printStackTrace();
         }
     }
 
@@ -517,7 +517,6 @@ public class Index extends BPlusTree {
             System.out.println("Returned 0 values.\n");
             return intToken;
         } else {
-            //System.out.println("Processing input...\n");
             for (String token : val) {
                 token = val.toString().replace("[", "").replace("]", "").trim();
                 intToken = Integer.valueOf(token);
@@ -536,7 +535,7 @@ public class Index extends BPlusTree {
      * @param list2 ,contains the values from the second pair to be joined
      * @return a linked list containing the joined integer elements
      */
-    static LinkedList<Integer> generalJoin(LinkedList<Integer> list1, LinkedList<Integer> list2) {
+    static LinkedList<Integer> join(LinkedList<Integer> list1, LinkedList<Integer> list2) {
         LinkedList<Integer> joinList = new LinkedList<>();
         if (!list1.isEmpty() && !list2.isEmpty()) {
             for (int i : list1) {
@@ -551,7 +550,7 @@ public class Index extends BPlusTree {
         }
     }
 
-    /**
+    /*/**
      * Join algorithm that uses the Indexes to create the joined data structure
      * For each value in the treeValues list
      * search with that value as id in the "correct" (this) tree
@@ -566,6 +565,7 @@ public class Index extends BPlusTree {
      * @throws IOException                ''
      * @throws InvalidBTreeStateException ''
      */
+    /*
     public LinkedList<Integer> starJoin(String joinParam1, String joinParam2,
                                         LinkedList<Integer> treeValues) throws IOException, InvalidBTreeStateException {
         LinkedList<Integer> joinList = new LinkedList<>();
@@ -581,14 +581,19 @@ public class Index extends BPlusTree {
         keyValues.clear();
         basicTreesValues.clear();
         return joinList;
-    }
+    }*/
 
     static LinkedList<Integer> queryOP_S(LinkedList<Integer> placesValuesFound, Index indexOP_S) throws IOException, InvalidBTreeStateException {
         LinkedList<Integer> subjectList = new LinkedList<>();
+        long startTime;
+        long stopTime;
+        startTime = System.nanoTime();
         if (!placesValuesFound.isEmpty()) {
             for (int token : placesValuesFound) {
                 subjectList.add(Index.myPreprop(indexOP_S.searchKey(token, false).getValues()));
             }
+            stopTime = System.nanoTime();
+            System.out.println("Preprocess overhead:" + (stopTime - startTime) / Math.pow(10, 9));
             return subjectList;
         } else {
             return subjectList;
@@ -617,43 +622,6 @@ public class Index extends BPlusTree {
         } else {
             return objectList;
         }
-    }
-
-    static ArrayList<String> reconstructArrayList(String path) throws UnknownIndexException {
-        switch (path) {
-            case "SP_O":
-                path = mappingSP_OFilePath;
-                break;
-            case "OP_S":
-                path = mappingOP_SFilePath;
-                break;
-            case "SO_P":
-                path = mappingSO_PFilePath;
-                break;
-            default:
-                throw new UnknownIndexException();
-        }
-        System.out.println("Reconstructing ArrayList...\n");
-        BufferedReader reader;
-        String line;
-        ArrayList<String> arrayList = new ArrayList<>();
-        try {
-            String values;
-            int index;
-            reader = new BufferedReader(new FileReader(path));
-            while ((line = reader.readLine()) != null && line.contains("%")) {
-                int indexOfDelimiter = line.indexOf("%");
-                index = Integer.parseInt(line.substring(indexOfDelimiter + 1, line.length()));
-                values = line.substring(0, indexOfDelimiter);
-                arrayList.add(index, values);
-            }
-            reader.close();
-            System.out.println("ArrayList reconstructing finished...\n");
-            return arrayList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return arrayList;
     }
 
     private void clearHashMaps() {

@@ -250,9 +250,6 @@ public class ReadFile {
         //createDecodedFile();
     }
 
-    /**
-     * Closes the global scope buffered writer
-     */
     private void closeWriterEncoder(BufferedWriter bw) throws IOException {
         bw.close();
     }
